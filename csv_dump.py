@@ -1,50 +1,34 @@
 import os
 import csv
+import sys
 
 from algoliasearch.search_client import SearchClient
 
-client = SearchClient.create(os.environ['ALGOLIA_APP_ID'], os.environ['ALGOLIA_API_KEY'])
-index = client.init_index('us_foodbank')
-res = index.browse_objects()
+def dump_to_csv(csv_path):
+    client = SearchClient.create('JWHPBFC4T1', '0d4e43a67ee4dd5d1ea7a667aded6c7e')
+    index = client.init_index('us_foodbank')
+    res = index.browse_objects()
 
-csv_path = 'path/to/nkh.csv'
-with open(csv_path, 'w') as fp:
-	writer = csv.writer(fp)
+    with open(csv_path, 'w') as fp:
+        writer = csv.writer(fp)
 
-	header = [
-		'siteName', 
-		'siteStatus',	
-		'siteAddress', 
-		'siteState',	
-		'siteZip', 
-		'contactPhone', 
-		'startDate',	
-		'endDate', 
-		'daysofOperation', 
-		'breakfastTime', 
-		'lunchTime', 
-		'snackTimeAM', 
-		'snackTimePM', 
-		'dinnerSupperTime'
-	]
-	writer.write(header)
+        header = ['siteName', 'siteStatus', 'siteAddress', 'siteState', 'siteZip', 'contactPhone', 'startDate',
+                  'endDate', 'daysofOperation', 'breakfastTime', 'lunchTime', 'snackTimeAM', 'snackTimePM',
+                  'dinnerSupperTime']
+        writer.writerow(header)
 
-	for hit in res:
-		data = [
-			hit['siteName'],
-			hit['siteStatus'],
-			hit['siteAddress'],
-			hit['siteState'],
-			hit['siteZip'],
-			hit['contactPhone'],
-			hit['startDate'],
-			hit['endDate'],
-			hit['daysofOperation'],
-			hit['breakfastTime'],
-			hit['lunchTime'],
-			hit['snackTimeAM'],
-			hit['snackTimePM'],
-			hit['dinnerSupperTime'],
-		]
-		# TODO: format data
-	    writer.write(data)
+        for hit in res:
+            data = []
+            for col in header:
+                data.append(hit[col])
+
+            writer.writerow(data)
+
+
+if __name__ == '__main__':
+	if len(sys.argv) == 2:
+		csv_path = sys.argv[1]
+	else:
+		csv_path = '/path/to/nkh.csv'
+
+	dump_to_csv(csv_path)
